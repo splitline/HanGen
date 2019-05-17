@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.4.6/fabric.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            z-index: 1024;
+        }
+
+        canvas#c {
+            display: block;
+            position: fixed;
+            top: 0;
+            z-index: 0;
+        }
+
+        .container {
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+    </style>
+    <title>Marvel 韓總產生器 | HanGen</title>
+</head>
+
+<body>
+    <section class="hero is-info">
+        <a href="https://github.com/splitline/HanGen" style="position: absolute;right: 0;"><img width="149" height="149"
+                src="https://github.blog/wp-content/uploads/2008/12/forkme_right_gray_6d6d6d.png?resize=149%2C149"
+                class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    Marvel 韓總產生器
+                    <a class="button is-warning" onclick="faDaCai()">
+                        <span class="icon is-small">
+                            <i class="fas fa-dollar-sign"></i>
+                        </span>
+                        發大財
+                    </a>
+                </h1>
+                <h2 class="subtitle">
+                    HanGen
+                </h2>
+            </div>
+        </div>
+    </section>
+    <canvas id="c"></canvas>
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="column">
+                <div class="card card-content">
+                    <div class="file is-large is-boxed">
+                        <label class="file-label">
+                            <input class="file-input" type="file" id="file-input">
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">
+                                    選擇一張圖片
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+                    <p>或是</p>
+                    <input type="text" class="input" placeholder="輸入圖片網址">
+                    <hr>
+                    <a class="button is-danger is-fullwidth" id="del">
+                        <span>刪除選中的素材</span>
+                        <span class="icon is-small">
+                            <i class="fas fa-trash-alt"></i>
+                        </span>
+                    </a>
+                    <br>
+                    <a class="button is-success is-fullwidth" download="file" id="download">
+                        <span>下載韓總大大！</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>HanGen</strong> by <a href="https://github.com/splitline">splitline</a>.
+            </p>
+            <p>
+                <a class="github-button" href="https://github.com/splitline/HanGen" data-icon="octicon-star"
+                    data-size="large" data-show-count="true" aria-label="Star splitline/HanGen on GitHub">Star</a>
+            </p>
+        </div>
+    </div>
+    <script>
+        const canvas = new fabric.Canvas('canvas', {
+            controlsAboveOverlay: true,
+            preserveObjectStacking: true
+        });
+        const fileInput = document.getElementById('file-input');
+
+        document.getElementById('del').onclick = () => {
+            fileInput.value = "";
+            canvas.remove(canvas.getActiveObject());
+        }
+        document.getElementById('download').onclick = e => e.target.href = canvas.toDataURL('png');
+
+        fabric.Image.fromURL('han.png', function (img) {
+            canvas.setWidth(img.width)
+                .setHeight(img.height)
+                .setOverlayImage(img)
+                .setBackgroundColor("#209cee")
+                .renderAll();
+        });
+
+
+
+        fileInput.addEventListener("change", (e) => {
+            var file = e.target.files[0];
+            var reader = new FileReader();
+            reader.onload = function (f) {
+                var data = f.target.result;
+                fabric.Image.fromURL(data, function (img) {
+                    canvas.add(img.set({
+                        cornerSize: 24,
+                        transparentCorners: false,
+                        left: canvas.width / 2 - img.width / 2,
+                        top: canvas.height / 2 - img.height / 2 + 120,
+                    })).renderAll();
+                });
+            };
+            reader.readAsDataURL(file);
+
+        });
+
+
+        // ===== background =====
+        // Ref. https://codepen.io/AchrafBoujjou/pen/RxjWXB
+        function faDaCai() {
+            // geting canvas by Boujjou Achraf
+            var c = document.getElementById("c");
+            var ctx = c.getContext("2d");
+
+            //making the canvas full screen
+            c.height = window.innerHeight;
+            c.width = window.innerWidth;
+
+            var matrix = "發大財！";
+            //converting the string into an array of single characters
+            matrix = matrix.split("");
+
+            var font_size = 18;
+            var columns = c.width / font_size; //number of columns for the rain
+            //an array of drops - one per column
+            var drops = [];
+            //x below is the x coordinate
+            //1 = y co-ordinate of the drop(same for every drop initially)
+            for (var x = 0; x < columns; x++)
+                drops[x] = 1;
+
+            //drawing the characters
+            function draw() {
+                //Black BG for the canvas
+                //translucent BG to show trail
+                ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+                ctx.fillRect(0, 0, c.width, c.height);
+
+                ctx.fillStyle = "#ffdd57"; //green text
+                ctx.font = font_size + "px arial";
+                //looping over drops
+                for (var i = 0; i < drops.length; i++) {
+                    //a random chinese character to print
+                    var text = matrix[Math.floor(Math.random() * matrix.length)];
+                    //x = i*font_size, y = value of drops[i]*font_size
+                    ctx.fillText(text, i * font_size, drops[i] * font_size);
+
+                    //sending the drop back to the top randomly after it has crossed the screen
+                    //adding a randomness to the reset to make the drops scattered on the Y axis
+                    if (drops[i] * font_size > c.height && Math.random() > 0.975)
+                        drops[i] = 0;
+
+                    //incrementing Y coordinate
+                    drops[i]++;
+                }
+            }
+
+            setInterval(draw, 35);
+        }
+    </script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+</body>
+
+</html>
